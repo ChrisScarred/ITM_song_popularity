@@ -12,15 +12,23 @@ NON_INCLUDE_TRACKS = ["Interview (Bonus)"]
 
 NAME = 'itm_songs_database'
 K = 10
+EPOCHS = 10
+R_THRESHOLD = 0.05
+MAPE_THRESHOLD = 0.22
+
 
 class Controller:
-	def __init__(self, getData, doPreprocess, auto, svc, bms, noa):
+	def __init__(self, getData, doPreprocess, auto, svm, bms, noa, print_svm, print_bms, print_noa, brute_force):
 		self.getData = getData
 		self.doPreprocess = doPreprocess
 		self.auto = auto
-		self.svc = svc
+		self.svm = svm
 		self.bms = bms
 		self.noa = noa
+		self.print_svm = print_svm
+		self.print_bms = print_bms
+		self.print_noa = print_noa
+		self.brute_force = brute_force
 
 	def performActions(self):
 		data = []
@@ -51,13 +59,13 @@ class Controller:
 
 
 		if path.exists(NAME+"_preprocessed.csv"):
-			a = Analyses(data, K)
-			if self.svc:
-				a.singleVarCorrelations()
+			a = Analyses(data, K, EPOCHS, R_THRESHOLD, MAPE_THRESHOLD)
+			if self.svm:
+				a.singleVarModels(self.print_svm)
 			if self.bms:
-				a.bestModelSearch()
+				a.bestModelSearch(self.print_bms, self.brute_force)
 			if self.noa:
-				a.normalisedOrAbsolute()		
+				a.normalisedOrAbsolute(self.print_noa)		
 
 		else:
 			print("File does not exist, not performing analysis.")
