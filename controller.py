@@ -18,7 +18,7 @@ MAPE_THRESHOLD = 0.22
 
 
 class Controller:
-	def __init__(self, getData, doPreprocess, auto, svm, bms, noa, print_svm, print_bms, print_noa, brute_force):
+	def __init__(self, getData, doPreprocess, auto, svm, bms, noa, print_svm, print_bms, print_noa, brute_force, bf_pickle):
 		self.getData = getData
 		self.doPreprocess = doPreprocess
 		self.auto = auto
@@ -29,6 +29,7 @@ class Controller:
 		self.print_bms = print_bms
 		self.print_noa = print_noa
 		self.brute_force = brute_force
+		self.bf_pickle = bf_pickle
 
 	def performActions(self):
 		data = []

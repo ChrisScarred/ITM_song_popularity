@@ -3,7 +3,11 @@ import statsmodels.api as sm
 import numpy as np
 from itertools import combinations
 from random import randint
+from multiprocessing import Pool, cpu_count
+import os
 
+
+TARGET = 0
 
 class Analyses:
 	def __init__(self, data, k, epochs, r_threshold, mape_threshold):
@@ -156,7 +160,7 @@ class Analyses:
 		combs = [item for sublist in combs for item in sublist]
 
 		for target in targets:
-			mdls = []
+			mdls = []			
 			for vrs in combs:
 				model_str = target + " ~ "
 				for i in range(len(vrs)):
@@ -172,45 +176,57 @@ class Analyses:
 		best_mapes = []
 		best_rs = []
 
+		# number of chunks and processes equal to cpu count
+		processes = int(os.getenv('CPU_COUNT', cpu_count()))
+
 		for i in range(len(models)):
-			target = models[i][0]			
-			mdls = []
-			mapes_i = []
-			rs_i = []
-			j = 0
-			for model in models[i][1]:
-				if j%1000==0:
-					print("Evaluating %d model" % j)
-				train, test = self.trainTestData()
-				mdl = sm.formula.ols(formula = model, data = train)
-				model_fitted = mdl.fit()
-				r = model_fitted.rsquared
-				prediction = list(model_fitted.predict(test))
-				target_vals = list(test[target])
+			target = models[i][0]
+			global TARGET
+			TARGET = target
 
-				mape = []
-				for i in range(len(prediction)):
-					targ = target_vals[i]
-					pred = prediction[i]
-					if targ == 0:
-						mape.append(abs(targ - pred))
-					else:
-						mape.append(abs(targ - pred)/targ)
-				mape = np.mean(mape)
+			chunk = self.chunks(models[i][1],processes)			
 
-				if r > self.r_threshold or mape < self.mape_threshold:
-					mdls.append(model)
-					mapes_i.append(mape)
-					rs_i.append(r)
+			print("parallel processing of brute force obtained models started")
+			with Pool(processes=processes) as pool:
+				results = pool.map(self.brute_force_parallel, chunk)
+				print(results)
+				best_models.append((target, results[0][0]))
+				best_mapes.append(results[0][1])
+				best_rs.append(results[0][2])
 
-				j+=1
-
-			best_models.append((target, mdls))
-			best_mapes.append(mapes_i)
-			best_rs.append(rs_i)
+			print("parallel processing of brute force obtained models ended")
 
 		return best_models,best_mapes,best_rs
 
+	def brute_force_parallel(self, chunk):
+		mdls = []
+		mapes_i = []
+		rs_i = []
+
+		for model in chunk[0]:
+			train, test = self.trainTestData()
+			mdl = sm.formula.ols(formula = model, data = train)
+			model_fitted = mdl.fit()
+			r = model_fitted.rsquared
+			prediction = list(model_fitted.predict(test))
+			target_vals = list(test[TARGET])
+
+			mape = []
+			for i in range(len(prediction)):
+				targ = target_vals[i]
+				pred = prediction[i]
+				if targ == 0:
+					mape.append(abs(targ - pred))
+				else:
+					mape.append(abs(targ - pred)/targ)
+			mape = np.mean(mape)
+
+			if r > self.r_threshold or mape < self.mape_threshold:
+				mdls.append(model)
+				mapes_i.append(mape)
+				rs_i.append(r)
+
+		return [[mdls], [mapes_i], [rs_i]]
 
 
 	# gets performance of models (MAPE) soecified by R-style strings over x epochs
@@ -321,3 +337,23 @@ class Analyses:
 				train_data = pd.concat([train_data, dat])
 		return train_data, folds[i]
 
+
+	def chunks(self, data, processes):
+		folds = []
+		length = len(data)
+		addition = 0
+		size = 0
+
+		if length % processes == 0:
+			size = int(length / processes)
+		else:
+			addition = length % processes
+			size = int((length - addition) / processes)
+
+		for i in range(processes):
+			if i == processes-1:				
+				folds.append(data[(i*size):])
+			else:
+				folds.append(data[(i*size):((i+1)*size)])
+
+		yield folds

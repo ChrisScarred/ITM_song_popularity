@@ -17,7 +17,7 @@ def main():
 
 	# get best models
 	bms = True
-	print_bms = False
+	print_bms = True
 
 	# get results on abs vs rel
 	noa = False
