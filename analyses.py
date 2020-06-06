@@ -5,9 +5,16 @@ from itertools import combinations
 from random import randint
 from multiprocessing import Pool, cpu_count
 import os
+import pickle
 
 
 TARGET = 0
+MODELFILE = 'data/models.pickle'
+MAPEFILE = 'data/mape.pickle'
+RFILE = 'data/r.pickle'
+
+RTBF = 0.10
+MTBF = 0.10
 
 class Analyses:
 	def __init__(self, data, k, epochs, r_threshold, mape_threshold):
@@ -98,7 +105,7 @@ class Analyses:
 			self.printModel(pure_models[i], print_perfs[i], print_r[i])
 
 	# TODO
-	def bestModelSearch(self, print_it, brute_force):		
+	def bestModelSearch(self, print_it, brute_force, bf_pickle):		
 		'''
 		s_models, s_mape, s_r = self.bestSingleVars(False)
 		if len(s_models) > 0:
@@ -111,6 +118,7 @@ class Analyses:
 		'''
 
 		f_models, f_mape, f_r  = self.forward_selection()
+		f_models = [item for sublist in f_models for item in sublist]
 		if len(f_models) > 0:
 			if print_it:
 				self.printModels(f_models, f_mape, f_r, string="Best models obtained via forward selection:")
@@ -129,7 +137,41 @@ class Analyses:
 			print("No well-performing model found via backward selection.")
 
 		if brute_force:
-			bf_models, bf_mape, bf_r  = self.brute_force()
+			bf_models = []
+			bf_mape = []
+			bf_r = []
+			loaded = False
+
+			if bf_pickle:
+				bf_models = []
+				bf_mape = []
+				bf_r = []				
+
+				try:
+					with open(MODELFILE, 'rb') as handle:
+						bf_models = pickle.load(handle)
+					with open(MAPEFILE, 'rb') as handle:
+						bf_mape = pickle.load(handle)
+					with open(RFILE, 'rb') as handle:
+						bf_r = pickle.load(handle)
+					loaded = True
+				except:
+					print("Loading failed, generation starting.")
+
+			if not loaded:
+				bf_models, bf_mape, bf_r  = self.brute_force()
+
+				if len(bf_models) > 0:
+					try:
+						with open(MODELFILE, 'wb') as handle:
+							pickle.dump(bf_models, handle, protocol=pickle.HIGHEST_PROTOCOL)
+						with open(MAPEFILE, 'wb') as handle:
+							pickle.dump(bf_mape, handle, protocol=pickle.HIGHEST_PROTOCOL)
+						with open(RFILE, 'wb') as handle:
+							pickle.dump(bf_r, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+					except:
+						print("Saving failed.")
 			if len(bf_models) > 0:
 				if print_it:
 					self.printModels(bf_models, bf_mape, bf_r, string="Best models obtained via brute force search:")
@@ -139,7 +181,84 @@ class Analyses:
 				print("No well-performing model found via brute force search.")
 
 	def forward_selection(self):
-		return [],[],[]
+		singleVarModels, mape, r = self.singleVarModels(False)
+		best_mape_model, best_mape = self.getBest(singleVarModels, mape, True)
+		best_r_model, best_r = self.getBest(singleVarModels, r, False)
+
+		sep = " ~ "
+		target = best_mape_model.split(sep)[0]
+		best_mape_model = [(target,[best_mape_model])]
+
+		sep = " ~ "
+		target = best_r_model.split(sep)[0]
+		best_r_model = [(target,[best_r_model])]
+
+		no_includes = ["name", "id"]
+		targets = ["popularity_rel", "popularity_abs"]
+		variables = [c for c in self.data.columns if c not in targets and c not in no_includes]
+
+		gain_mape = True
+		gain_r = True
+		while gain_mape or gain_r:
+			mapes = []
+			rs = []
+			mape_models = []
+			r_models = []
+			for var in variables:
+				if var not in best_mape_model[0][1][0] and gain_mape:					
+					new_mape_model = best_mape_model[0][1][0] + " + " + var			
+					target = best_mape_model[0][0]
+					model = [(target, [new_mape_model])]
+					
+					mape, r = self.getPerformance(model, False)
+
+					if mape < best_mape:
+						mape_models.append(model)
+						mapes.append(mape)
+
+				if var not in best_r_model[0][1][0] and gain_r:
+					new_r_model = best_r_model[0][1][0] + " + " + var					
+					target = best_r_model[0][0]
+					model = [(target, [new_r_model])]
+					
+					mape, r = self.getPerformance(model, False)
+
+					if r > best_r:
+						r_models.append(model)
+						rs.append(r)
+
+			if mapes == []:
+				gain_mape = False
+			else:
+				best_mape_model, best_mape = self.getBest(mape_models[0], mapes, True)		
+				sep = " ~ "
+				target = best_mape_model.split(sep)[0]
+				best_mape_model = [(target,[best_mape_model])]
+			if rs == []:
+				gain_r = False
+			else:
+				best_r_model, best_r = self.getBest(r_models[0], rs, False)
+				sep = " ~ "
+				target = best_r_model.split(sep)[0]
+				best_r_model = [(target,[best_r_model])]
+
+		m, r_for_mape = self.getPerformance(best_mape_model, False)
+		mape_for_r, n = self.getPerformance(best_r_model, False)
+
+		return [best_mape_model, best_r_model],[[best_mape],[mape_for_r]],[[r_for_mape],[best_r]]
+
+	def getBest(self, models, criterion, lower):
+		models = [item[1] for item in models]
+		models = [item for sublist in models for item in sublist]
+		criterion = [item for sublist in criterion for item in sublist]
+		
+		zipped = zip(models, criterion)		
+		res = sorted(zipped, key=lambda x: x[1])
+		
+		if lower:
+			return res[0][0], res[0][1]
+		return res[-1][0], res[-1][1]
+
 
 	def backward_selection(self):
 		return [],[],[]
@@ -186,15 +305,14 @@ class Analyses:
 
 			chunk = self.chunks(models[i][1],processes)			
 
-			print("parallel processing of brute force obtained models started")
 			with Pool(processes=processes) as pool:
 				results = pool.map(self.brute_force_parallel, chunk)
-				print(results)
-				best_models.append((target, results[0][0]))
-				best_mapes.append(results[0][1])
-				best_rs.append(results[0][2])
+				results = [item for sublist in results for item in sublist]
+				results = [item for sublist in results for item in sublist]
 
-			print("parallel processing of brute force obtained models ended")
+				best_models.append((target, results[0]))
+				best_mapes.append(results[1])
+				best_rs.append(results[2])
 
 		return best_models,best_mapes,best_rs
 
@@ -221,7 +339,7 @@ class Analyses:
 					mape.append(abs(targ - pred)/targ)
 			mape = np.mean(mape)
 
-			if r > self.r_threshold or mape < self.mape_threshold:
+			if r > RTBF and mape < MTBF:
 				mdls.append(model)
 				mapes_i.append(mape)
 				rs_i.append(r)
@@ -242,7 +360,6 @@ class Analyses:
 		no_of_targets = len(models)
 			
 		for epoch in range(self.epochs):
-			print("Calculating epoch %d" % (epoch+1))
 			kfolds = self.kfolds(self.k, True)
 	
 			test_indices = []

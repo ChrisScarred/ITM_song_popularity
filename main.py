@@ -26,8 +26,10 @@ def main():
 	# whether to do brute force analysis
 	# WARNING: over 64k models are evaluated, it takes some time...
 	brute_force = True
+	# attempts to read bf models from file before creating them
+	bf_pickle = True
 
-	controller = Controller(getData, doPreprocess, auto, svm, bms, noa, print_svm, print_bms, print_noa, brute_force)
+	controller = Controller(getData, doPreprocess, auto, svm, bms, noa, print_svm, print_bms, print_noa, brute_force, bf_pickle)
 	controller.performActions()
 	
 

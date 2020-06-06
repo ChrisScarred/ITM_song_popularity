@@ -10,7 +10,8 @@ ARTIST_URI = 'spotify:artist:6tbLPxj1uQ6vsRQZI2YFCT'
 NON_INCLUDE_ALBUMS = ["Blood at the Orpheum (Live)", "Blood"]
 NON_INCLUDE_TRACKS = ["Interview (Bonus)"]
 
-NAME = 'itm_songs_database'
+FOLDER = 'data'
+NAME = FOLDER + '/itm_songs_database'
 K = 10
 EPOCHS = 10
 R_THRESHOLD = 0.05
@@ -64,7 +65,7 @@ class Controller:
 			if self.svm:
 				a.singleVarModels(self.print_svm)
 			if self.bms:
-				a.bestModelSearch(self.print_bms, self.brute_force)
+				a.bestModelSearch(self.print_bms, self.brute_force, self.bf_pickle)
 			if self.noa:
 				a.normalisedOrAbsolute(self.print_noa)		
 
