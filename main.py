@@ -13,14 +13,6 @@ def main():
 	'''
 	auto = True
 
-	'''
-	whether to do brute force analysis
-	
-	WARNING: over 64k models are evaluated, it takes some time 
-	if pickling fails
-	'''
-	brute_force = True
-
 	# instead of printing results, write them into results.log
 	log = True
 
@@ -30,7 +22,7 @@ def main():
 	# creates summary files for all well-performing and queried models
 	full_sum = True
 
-	controller = Controller(getData, doPreprocess, auto, brute_force, log, custom, full_sum)
+	controller = Controller(getData, doPreprocess, auto, log, custom, full_sum)
 	controller.performActions()
 	
 

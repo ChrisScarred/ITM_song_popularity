@@ -13,8 +13,6 @@ import logging
 
 from pathlib import Path
 
-TARGET = ""
-
 root = Path(".")
 
 BF_MODELFILE = root / "data" / 'bf_models.pickle'
@@ -39,8 +37,7 @@ BSVM_RFILE = root / "data" / 'bsvm_r.pickle'
 
 MEAN_FILE = root / "data" / 'mean.pickle'
 
-RTBF = 0.10
-MTBF = 0.10
+
 EPOCHS = 10
 R_THRESHOLD = 0.05
 MAPE_THRESHOLD = 0.20
@@ -54,9 +51,7 @@ class Analyses:
 
 
 	def printSummaries(self, models):
-		for string in models:
-			print(models)
-			print(string)
+		for string in models:			
 			mdl = sm.formula.ols(formula = string, data = self.data)
 			model_fitted = mdl.fit()
 			res = str(model_fitted.summary())
@@ -147,7 +142,7 @@ class Analyses:
 		return models, mapes, rs
 
 	
-	def bestModelSearch(self, brute_force):
+	def bestModelSearch(self):
 		models, mapes, rs = self.modelGetter(SVM_MODELFILE, SVM_MAPEFILE, SVM_RFILE, self.singleVarModels(), 
 			"All single variable models:", "No single variable model found.")
 
@@ -156,17 +151,13 @@ class Analyses:
 
 		models3, mapes3, rs3 = self.modelGetter(FS_MODELFILE, FS_MAPEFILE, FS_RFILE, self.forward_selection(models, mapes, rs), 
 			"Best models obtained via forward selection:", "No well-performing model found via forward selection.")
-
+		
 		models4, mapes4, rs4 = self.modelGetter(BS_MODELFILE, BS_MAPEFILE, BS_RFILE, self.backward_selection(), 
 			"Best models obtained via backward selection:", "No well-performing model found via backward selection.")
-		models5, mapes5, rs5 = [], [], []
-		if brute_force:
-			models5, mapes5, rs5 = self.doBruteForce()
-
-		models.append(models2)
-		models.append(models3)
-		models.append(models4)
-		models.append(models5)
+		
+		models.extend(models2)
+		models.extend(models3)
+		models.extend(models4)
 
 		return models 
 
@@ -331,144 +322,6 @@ class Analyses:
 
 		return final_models, final_mape, final_r
 
-	def doBruteForce(self):
-		models, r1 = pickleLoader(BF_MODELFILE, self.log)
-		mapes, r2 = pickleLoader(BF_MAPEFILE, self.log)
-		rs, r3 = pickleLoader(BF_RFILE, self.log)
-		means, r4 = pickleLoader(MEAN_FILE, self.log)
-
-		if not r1 or not r2 or not r3 or not r4:
-			models, mapes, rs, mean_mapes_abs, mean_mapes_rel, mean_r_abs, mean_r_rel = self.brute_force()
-			means = [mean_mapes_abs, mean_mapes_rel, mean_r_abs, mean_r_rel]
-
-		if len(models) > 0:
-			pickleWriter(models, BF_MODELFILE, self.log)
-			pickleWriter(mapes, BF_MAPEFILE, self.log)
-			pickleWriter(rs, BF_RFILE, self.log)
-			pickleWriter(means, MEAN_FILE, self.log)
-
-			for m in models:
-				if m not in self.bestModels:
-					self.bestModels.append(m)
-
-			targets = ["popularity_rel", "popularity_abs"]
-			string = ("\n----------------------------------\nBased on comparison of all possible models, the average MAPE for '%s' is %.3f and for '%s' %.3f while the average r^2 for '%s' is %.3f and for '%s' %.3f"
-				% (targets[1], means[0], targets[0], means[1], targets[1], means[2], targets[0], means[3]))
-			logPrintIt(self.log, string)
-
-		else:
-			logPrintIt(self.log, "No well-performing model found via brute force search.")
-		return models, mapes, rs
-
-	def brute_force(self):
-		models = []
-		targets, variables = self.getTargVars()	
-		i = len(variables)-1
-		combs = [[variables]]
-
-		while i > 1:
-			comb = [j for j in combinations(variables, i)]
-			combs.append(comb)
-			i -= 1
-
-		combs = [item for sublist in combs for item in sublist]
-
-		for target in targets:
-			mdls = []			
-			for vrs in combs:
-				model_str = target + " ~ "
-				for i in range(len(vrs)):
-					if i == len(vrs)-1:
-						model_str += vrs[i]
-					else:
-						model_str += vrs[i]
-						model_str += " + "				
-				mdls.append(model_str)
-			models.append((target, mdls))
-
-		bestModels = []
-		best_mapes = []
-		best_rs = []
-
-		all_mapes_abs = []
-		all_mapes_rel = []
-		all_r_abs = []
-		all_r_rel = []
-
-		# number of chunks and processes equal to cpu count
-		processes = int(os.getenv('CPU_COUNT', cpu_count()))
-
-		for i in range(len(models)):
-			target = getTarget(models[i][0])
-			global TARGET
-			TARGET = target
-
-			chunk = chunks(models[i], processes)			
-
-			with Pool(processes=processes) as pool:
-				a = pool.map(self.brute_force_parallel, chunk)
-
-				print(a)
-				
-				bestModels.append(mdls1)
-				best_mapes.append(mapes_i1)
-				best_rs.append(rs_i1)
-
-				all_mapes_abs.extend(all_mapes_abs1)
-				all_mapes_rel.extend(all_mapes_rel1)
-				all_r_abs.extend(all_r_abs1)
-				all_r_rel.extend(all_r_rel1)
-
-		mean_mapes_abs = np.mean(all_mapes_abs)
-		mean_mapes_rel = np.mean(all_mapes_rel)
-		mean_r_abs = np.mean(all_r_abs)
-		mean_r_rel = np.mean(all_r_rel)
-
-		self.printModels(bestModels, best_mapes, best_rs, string="The best models obtained by brute force:")
-
-		return bestModels, best_mapes, best_rs, mean_mapes_abs, mean_mapes_rel, mean_r_abs, mean_r_rel
-
-	def brute_force_parallel(self, chunk):
-		mdls = []
-		mapes_i = []
-		rs_i = []
-		all_mapes_abs = []
-		all_mapes_rel = []
-		all_r_abs = []
-		all_r_rel = []
-
-		for model in chunk[0]:
-			train, test = trainTestData(self.data)
-			mdl = sm.formula.ols(formula = model, data = train)
-			model_fitted = mdl.fit()
-			r = model_fitted.rsquared
-			prediction = list(model_fitted.predict(test))
-			target_vals = list(test[TARGET])
-
-			mape = []
-			for i in range(len(prediction)):
-				targ = target_vals[i]
-				pred = prediction[i]
-				if targ == 0:
-					mape.append(abs(targ - pred))
-				else:
-					mape.append(abs(targ - pred)/targ)
-			mape = np.mean(mape)
-
-			if "_abs" in model:
-				all_mapes_abs.append(mape)
-				all_r_abs.append(r)
-			else:
-				all_mapes_rel.append(mape)
-				all_r_rel.append(r)
-
-			if r > RTBF and mape < MTBF:
-				mdls.append(model)
-				mapes_i.append(mape)
-				rs_i.append(r)
-
-		return mdls, mapes_i, rs_i, all_mapes_abs, all_mapes_rel, all_r_abs, all_r_rel
-
 
 	def getPerformance(self, models, epochs=EPOCHS):
 		mapes = []
@@ -499,5 +352,3 @@ class Analyses:
 			rs.append(np.asarray(rs_all).mean())
 
 		return mapes, rs
-
-	

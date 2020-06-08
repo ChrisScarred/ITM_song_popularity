@@ -8,6 +8,7 @@ from os import path
 import pandas as pd
 import logging
 
+DATA = []
 
 ARTIST_URI = 'spotify:artist:6tbLPxj1uQ6vsRQZI2YFCT'
 NON_INCLUDE_ALBUMS = ["Blood at the Orpheum (Live)", "Blood"]
@@ -17,12 +18,10 @@ FOLDER = 'database'
 NAME = FOLDER + '/itm_songs_database'
 
 class Controller:
-	def __init__(self, getData, doPreprocess, auto, brute_force, log, custom, full_sum):
+	def __init__(self, getData, doPreprocess, auto, log, custom, full_sum):
 		self.getData = getData
 		self.doPreprocess = doPreprocess
 		self.auto = auto
-
-		self.brute_force = brute_force
 
 		self.log = log
 		self.custom = custom
@@ -80,20 +79,22 @@ class Controller:
 
 		a = Analyses(data, self.log)
 		
-		models2 = a.bestModelSearch(self.brute_force)
+		models2 = a.bestModelSearch()
 
 		models3 = []
 		if self.custom != []:
 			models3 = a.printCustom(self.custom)
 
-		models.append(models2)
-		models.append(models3)
+		models.extend(models2)
+		models.extend(models3)
 
 		if self.full_sum:
 			a.printSummaries(models)
 
 	def performActions(self):
 		data = self.composeData()
+		global DATA 
+		DATA = data
 		self.analyse(data)
 
 	def obtainData(self):

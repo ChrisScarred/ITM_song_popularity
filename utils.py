@@ -2,13 +2,19 @@ import logging
 import os.path
 
 import pandas as pd
+import numpy as np
 
 from os import path
 from random import randint
 
 import pickle
 
+import statsmodels.api as sm
+
+
 K = 10
+RTBF = 0.10
+MTBF = 0.10
 
 def pickleLoader(file, log):
 	try:	
@@ -68,27 +74,6 @@ def trainTestData(data):
 			dat = pd.DataFrame(folds[x])
 			train_data = pd.concat([train_data, dat])
 	return train_data, folds[i]
-
-
-def chunks(data, processes):
-	folds = []
-	length = len(data)
-	addition = 0
-	size = 0
-
-	if length % processes == 0:
-		size = int(length / processes)
-	else:
-		addition = length % processes
-		size = int((length - addition) / processes)
-
-	for i in range(processes):
-		if i == processes-1:				
-			folds.append(data[(i*size):])
-		else:
-			folds.append(data[(i*size):((i+1)*size)])
-
-	yield folds
 
 def getTarget(model):
 	return model.split(" ~ ")[0]
