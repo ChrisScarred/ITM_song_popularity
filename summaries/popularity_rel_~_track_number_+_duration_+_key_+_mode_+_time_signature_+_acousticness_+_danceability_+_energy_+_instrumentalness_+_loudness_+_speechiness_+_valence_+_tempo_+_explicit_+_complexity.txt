@@ -1,0 +1,41 @@
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:         popularity_rel   R-squared:                       0.269
+Model:                            OLS   Adj. R-squared:                  0.113
+Method:                 Least Squares   F-statistic:                     1.721
+Date:                Tue, 09 Jun 2020   Prob (F-statistic):             0.0665
+Time:                        01:14:25   Log-Likelihood:                 10.607
+No. Observations:                  86   AIC:                             10.79
+Df Residuals:                      70   BIC:                             50.06
+Df Model:                          15                                         
+Covariance Type:            nonrobust                                         
+====================================================================================
+                       coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------------
+Intercept            0.3899      0.316      1.235      0.221      -0.240       1.019
+track_number        -0.0195      0.008     -2.319      0.023      -0.036      -0.003
+duration             0.1033      0.439      0.236      0.814      -0.772       0.978
+key                  0.0044      0.008      0.535      0.594      -0.012       0.021
+mode                -0.0125      0.057     -0.218      0.828      -0.127       0.102
+time_signature      -0.0229      0.069     -0.332      0.741      -0.160       0.114
+acousticness        -0.1735      0.199     -0.874      0.385      -0.569       0.222
+danceability        -0.0030      0.346     -0.009      0.993      -0.693       0.687
+energy              -0.0656      0.287     -0.228      0.820      -0.639       0.508
+instrumentalness     0.0784      0.217      0.362      0.719      -0.354       0.511
+loudness            -0.0578      0.294     -0.197      0.845      -0.644       0.528
+speechiness          0.0968      0.301      0.321      0.749      -0.504       0.698
+valence             -0.0240      0.245     -0.098      0.922      -0.514       0.466
+tempo               -0.0005      0.001     -0.553      0.582      -0.002       0.001
+explicit             0.1837      0.118      1.563      0.123      -0.051       0.418
+complexity           0.6063      0.424      1.430      0.157      -0.239       1.452
+==============================================================================
+Omnibus:                        3.752   Durbin-Watson:                   0.836
+Prob(Omnibus):                  0.153   Jarque-Bera (JB):                3.108
+Skew:                           0.355   Prob(JB):                        0.211
+Kurtosis:                       2.398   Cond. No.                     3.54e+03
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 3.54e+03. This might indicate that there are
+strong multicollinearity or other numerical problems.

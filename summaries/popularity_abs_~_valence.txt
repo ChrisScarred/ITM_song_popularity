@@ -1,0 +1,25 @@
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:         popularity_abs   R-squared:                       0.038
+Model:                            OLS   Adj. R-squared:                  0.026
+Method:                 Least Squares   F-statistic:                     3.303
+Date:                Tue, 09 Jun 2020   Prob (F-statistic):             0.0727
+Time:                        01:14:25   Log-Likelihood:                -316.30
+No. Observations:                  86   AIC:                             636.6
+Df Residuals:                      84   BIC:                             641.5
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept     35.9853      1.977     18.206      0.000      32.055      39.916
+valence       12.7934      7.040      1.817      0.073      -1.206      26.792
+==============================================================================
+Omnibus:                        5.953   Durbin-Watson:                   0.671
+Prob(Omnibus):                  0.051   Jarque-Bera (JB):                3.601
+Skew:                           0.314   Prob(JB):                        0.165
+Kurtosis:                       2.219   Cond. No.                         7.13
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
