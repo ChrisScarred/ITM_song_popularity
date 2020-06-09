@@ -5,6 +5,9 @@ from utils import *
 from pathlib import Path
 import matplotlib.pyplot as plt
 import seaborn as sns
+import scipy
+from textwrap import wrap
+
 
 # files to save data in
 root = Path(".")
@@ -54,28 +57,29 @@ class Analyses:
 
 		for x in x_vars:
 			for y in y_vars:
-				self.scplot(self.data[x], self.data[y])				
+				self.scplot(x, y)				
 		for comb in colin_pairs:
 			x = comb[0]
 			y = comb[1]
-			self.scplot(self.data[x], self.data[y])
-		for model in statPlots:
+			self.scplot(x, y)
+		for model in statplots:
 			self.statPlots(model)
+
+		print("Done generating plots.")
 
 	def scplot(self, x, y):
 		plt.figure()
-		sns.scatterplot(x = x, y = y).set(title = ('Relationship between %s and %s' % (x, y)))
-		name = 'plots/'+x+"_againts_"+y+".png"
+		sns.scatterplot(x = self.data[x], y = self.data[y]).set(title = "\n".join(wrap(('Relationship between %s and %s' % (x, y)), 60)))
+		name = 'plots/scatters/'+x+"_againts_"+y+".png"
 		plt.savefig(name)
+		plt.close()
 
 	def scPredPlot(self, x, y, prediction):
-		print(x)
-		print(y)
-		print(pred)
-		sns.scatterplot(x = x, y = y).set(title = 'Relationship between %s and %s, including linear model' % (x, y))
-		sns.lineplot(x = x, y = prediction, color = '#bd1d00')
-		name = 'plots/'+x+"_againts_"+y+"with_prediction.png"
+		sns.scatterplot(x = self.data[x], y = self.data[y]).set(title = "\n".join(wrap('Relationship between %s and %s including linear model' % (x, y), 60)))
+		sns.lineplot(x = self.data[x], y = prediction, color = '#bd1d00')
+		name = 'plots/with_prediction/'+x+"_againts_"+y+"_with_prediction.png"
 		plt.savefig(name)
+		plt.close()
 
 	def statPlots(self, model_str):
 		model = sm.formula.ols(formula=model_str, data=self.data)
@@ -91,7 +95,7 @@ class Analyses:
 
 		for i in range(len(variables)):
 			vname = variables[i]
-			pred_score = intercept + model_fitted.params[i] * self.data[vname]
+			pred_score = intercept + model_fitted.params[i+1] * self.data[vname]
 			res_score = np.abs(self.data[vname] - pred_score)
 			predscores += pred_score
 			resscores += res_score
@@ -99,12 +103,12 @@ class Analyses:
 		fig, axs = plt.subplots(2, 2, figsize=(15,15))
 
 		sns.scatterplot(x = resscores, y = self.data[target], ax = axs[0,0]).set(
-			title = ('Absolute residuals against predicted values for model %s' % model_str), 
+			title = "\n".join(wrap(('Absolute residuals against predicted values for model %s' % model_str), 60)), 
 			xlabel = 'Predicted scores', 
 			ylabel = 'Residuals')
 
 		sns.distplot(resscores, bins = 15, ax = axs[0, 1]).set(
-			title = ('Histogram of residual scores for model %s' % model_str), 
+			title = "\n".join(wrap(('Histogram of residual scores for model %s' % model_str), 60)),
 			xlabel = 'Residual scores', 
 			ylabel = 'Probability')
 
@@ -113,13 +117,15 @@ class Analyses:
 		axs[1, 0].get_lines()[0].set_markeredgecolor('#c5c5d6')
 
 		sns.scatterplot(x = list(range(0, len(self.data[target]))), y = resscores, ax = axs[1,1]).set(
-			title = ('Residuals against order of collection for model %s' % model_str), 
+			title = "\n".join(wrap(('Residuals against order of collection for model %s' % model_str), 60)),
 			xlabel = 'Order of collection', 
 			ylabel = 'Residuals')
 
 		namestr = model_str.replace(" ", "_")
-		name = 'plots/statplot_'+namestr+".png"
+		name = 'plots/statplots/statplot_'+namestr+".png"
+		plt.tight_layout()
 		plt.savefig(name)
+		plt.close()
 
 	def printSummaries(self, models):
 		for string in models:			
@@ -407,13 +413,7 @@ class Analyses:
 				model = sm.formula.ols(formula = model_str, data = train)
 				model = model.fit()
 				rs_all.append(model.rsquared)
-				pred_y = np.asarray(model.predict(test))
-
-				if epoch == epochs-1:
-					variables = getVars(model_str)
-					if len(variables) == 1:
-						self.scPredPlot(test[variables[0]], real_y, pred_y)
-				
+				pred_y = np.asarray(model.predict(test))				
 				mape = []
 				for i in range(len(pred_y)):
 					targ = real_y[i]
@@ -425,5 +425,12 @@ class Analyses:
 				mapes_all.append(np.asarray(mape).mean())
 			mapes.append(np.asarray(mapes_all).mean())
 			rs.append(np.asarray(rs_all).mean())
+
+			variables = getVars(model_str)
+			if len(variables) == 1:
+				model = sm.formula.ols(formula = model_str, data = self.data)
+				model = model.fit()
+				pred = model.predict(self.data)
+				self.scPredPlot(variables[0], target, pred)
 
 		return mapes, rs

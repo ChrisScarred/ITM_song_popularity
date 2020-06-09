@@ -33,6 +33,7 @@ spotipy==2.12.0
 pandas==1.0.4
 numpy==1.18.5
 statsmodels==0.11.1
+scipy==1.4.1
 Python 3.6.9
 ```
 Not tested on other versions.

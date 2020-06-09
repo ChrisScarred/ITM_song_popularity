@@ -23,7 +23,18 @@ def main():
 	# plots these against each other in pairs to see if they are colinear
 	to_plot_colin = ['acousticness', 'loudness', 'complexity']
 	# list of models for which detailed stats are to be plotted
-	to_plot_stats = ['popularity_abs ~ complexity']
+	to_plot_stats = ['popularity_abs ~ track_number + duration + key + mode + acousticness + danceability + energy + instrumentalness + loudness + speechiness + valence + tempo + explicit + complexity',
+		'popularity_rel ~ track_number + duration + key + mode + time_signature + acousticness + danceability + energy + instrumentalness + loudness + speechiness + valence + tempo + explicit + complexity',
+		'popularity_abs ~ acousticness + track_number',
+		'popularity_abs ~ complexity + track_number + explicit',
+		'popularity_rel ~ duration',
+		'popularity_rel ~ acousticness',
+		'popularity_rel ~ loudness',
+		'popularity_rel ~ complexity',
+		'popularity_abs ~ duration',
+		'popularity_abs ~ acousticness',
+		'popularity_abs ~ loudness',
+		'popularity_abs ~ complexity']
 	# casting plotting ifo to a single var
 	to_plot = (to_plot_x, to_plot_y, to_plot_colin, to_plot_stats)
 

@@ -95,7 +95,7 @@ def getVars(model):
 	var = []
 	var_str = model.split(" ~ ")[1]
 	if "+" not in var_str:
-		return var_str
+		return [var_str]
 	else:
 		return var_str.split(" + ")
 	return var

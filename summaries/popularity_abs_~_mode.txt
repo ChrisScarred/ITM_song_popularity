@@ -2,9 +2,9 @@
 ==============================================================================
 Dep. Variable:         popularity_abs   R-squared:                       0.000
 Model:                            OLS   Adj. R-squared:                 -0.012
-Method:                 Least Squares   F-statistic:                  0.002553
-Date:                Tue, 09 Jun 2020   Prob (F-statistic):              0.960
-Time:                        14:43:23   Log-Likelihood:                -317.95
+Method:                 Least Squares   F-statistic:                  0.005724
+Date:                Tue, 09 Jun 2020   Prob (F-statistic):              0.940
+Time:                        19:38:59   Log-Likelihood:                -317.95
 No. Observations:                  86   AIC:                             639.9
 Df Residuals:                      84   BIC:                             644.8
 Df Model:                           1                                         
@@ -12,13 +12,13 @@ Covariance Type:            nonrobust
 ==============================================================================
                  coef    std err          t      P>|t|      [0.025      0.975]
 ------------------------------------------------------------------------------
-Intercept     38.9730      1.623     24.007      0.000      35.745      42.201
-mode           0.1087      2.151      0.051      0.960      -4.168       4.385
+Intercept     38.9189      1.623     23.974      0.000      35.691      42.147
+mode           0.1627      2.151      0.076      0.940      -4.114       4.439
 ==============================================================================
-Omnibus:                        5.866   Durbin-Watson:                   0.730
-Prob(Omnibus):                  0.053   Jarque-Bera (JB):                3.298
-Skew:                           0.267   Prob(JB):                        0.192
-Kurtosis:                       2.202   Cond. No.                         2.82
+Omnibus:                        5.863   Durbin-Watson:                   0.731
+Prob(Omnibus):                  0.053   Jarque-Bera (JB):                3.326
+Skew:                           0.272   Prob(JB):                        0.190
+Kurtosis:                       2.205   Cond. No.                         2.82
 ==============================================================================
 
 Warnings:
