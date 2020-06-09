@@ -20,10 +20,10 @@ To use the module, one only has to edit `main.py`, specifically these variables:
 - list `custom`: contains model strings (models) that should be analysed regardless whether they are considered good by the algorithm; can be empty
 - boolean `fullSum`: if True, saves summaries of all models considered good and all models in the list `custom` to the folder `summaries` by the name of the model
 - variables for plot generation:
--- list `to_plot_x`: a list of variables to plot against `to_plot_y` variables in a scatter plot
--- list `to_plot_y`: a list of variables to plot against `to_plot_x` variables in a scatter plot
--- list `to_plot_colin`: a list of variables to plot against each other in pairs to see if any of them appear to have a colinear relationship
--- list `to_plot_stats`: a list of model strings (models) for which statistic graphs should be generated and saved. These include absolute residuals graph, histogram of residuals, the probplot and residuals against order of collection.
+	- list `to_plot_x`: a list of variables to plot against `to_plot_y` variables in a scatter plot
+	- list `to_plot_y`: a list of variables to plot against `to_plot_x` variables in a scatter plot
+	- list `to_plot_colin`: a list of variables to plot against each other in pairs to see if any of them appear to have a colinear relationship
+	- list `to_plot_stats`: a list of model strings (models) for which statistic graphs should be generated and saved. These include absolute residuals graph, histogram of residuals, the probplot and residuals against order of collection.
 
 ## Prequisities
 ```
