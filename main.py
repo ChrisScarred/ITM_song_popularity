@@ -20,6 +20,9 @@ def main():
 	# this is the best forward/backward selection model based on r
 	custom = [""]
 
+	# creates summary files for all well-performing and queried models
+	full_sum = True
+
 	# plots these vars against 
 	to_plot_x = ['key', 'mode', 'time_signature', 'acousticness', 'danceability', 'energy', 'instrumentalness', 'loudness', 'speechiness',
 		'valence', 'tempo', 'explicit', 'complexity']
@@ -30,8 +33,6 @@ def main():
 	to_plot_stats = ['popularity_abs ~ complexity']
 
 	to_plot = (to_plot_x, to_plot_y, to_plot_colin, to_plot_stats)
-	# creates summary files for all well-performing and queried models
-	full_sum = True
 
 	controller = Controller(getData, doPreprocess, auto, log, custom, full_sum, to_plot)
 	controller.performActions()
