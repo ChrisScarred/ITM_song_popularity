@@ -69,7 +69,10 @@ class Analyses:
 		plt.savefig(name)
 
 	def scPredPlot(self, x, y, prediction):
-		sns.scatterplot(x = x, y = y).set(title = 'Relationship between %s and %s, including linear model' % )
+		print(x)
+		print(y)
+		print(pred)
+		sns.scatterplot(x = x, y = y).set(title = 'Relationship between %s and %s, including linear model' % (x, y))
 		sns.lineplot(x = x, y = prediction, color = '#bd1d00')
 		name = 'plots/'+x+"_againts_"+y+"with_prediction.png"
 		plt.savefig(name)
@@ -96,26 +99,26 @@ class Analyses:
 		fig, axs = plt.subplots(2, 2, figsize=(15,15))
 
 		sns.scatterplot(x = resscores, y = self.data[target], ax = axs[0,0]).set(
-   			title = ('Absolute residuals against predicted values for model %s' % model_str), 
-    		xlabel = 'Predicted scores', 
-    		ylabel = 'Residuals')
+			title = ('Absolute residuals against predicted values for model %s' % model_str), 
+			xlabel = 'Predicted scores', 
+			ylabel = 'Residuals')
 
 		sns.distplot(resscores, bins = 15, ax = axs[0, 1]).set(
-    		title = ('Histogram of residual scores for model %s' % model_str), 
-    		xlabel = 'Residual scores', 
-    		ylabel = 'Probability')
+			title = ('Histogram of residual scores for model %s' % model_str), 
+			xlabel = 'Residual scores', 
+			ylabel = 'Probability')
 
 		scipy.stats.probplot(resscores, plot = axs[1, 0])
 		axs[1, 0].get_lines()[0].set_markerfacecolor('#c5c5d6')
 		axs[1, 0].get_lines()[0].set_markeredgecolor('#c5c5d6')
 
 		sns.scatterplot(x = list(range(0, len(self.data[target]))), y = resscores, ax = axs[1,1]).set(
-   			title = ('Residuals against order of collection for model %s' % model_str), 
-  		  	xlabel = 'Order of collection', 
-  		  	ylabel = 'Residuals')
+			title = ('Residuals against order of collection for model %s' % model_str), 
+			xlabel = 'Order of collection', 
+			ylabel = 'Residuals')
 
 		namestr = model_str.replace(" ", "_")
-    	name = 'plots/statplot_'+namestr+".png"
+		name = 'plots/statplot_'+namestr+".png"
 		plt.savefig(name)
 
 	def printSummaries(self, models):
@@ -407,7 +410,9 @@ class Analyses:
 				pred_y = np.asarray(model.predict(test))
 
 				if epoch == epochs-1:
-					self.scPredPlot(test, real_y, pred_y)
+					variables = getVars(model_str)
+					if len(variables) == 1:
+						self.scPredPlot(test[variables[0]], real_y, pred_y)
 				
 				mape = []
 				for i in range(len(pred_y)):
