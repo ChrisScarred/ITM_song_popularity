@@ -1,26 +1,13 @@
-import pandas as pd
 import statsmodels.api as sm
 import numpy as np
-
 from itertools import combinations
-from random import randint
-from multiprocessing import Pool, cpu_count
 from utils import *
-
-import os
-import pickle
-import logging
-
 from pathlib import Path
-
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# files to save data in
 root = Path(".")
-
-BF_MODELFILE = root / "data" / 'bf_models.pickle'
-BF_MAPEFILE = root / "data" / 'bf_mape.pickle'
-BF_RFILE = root / "data" / 'bf_r.pickle'
 
 BS_MODELFILE = root / "data" / 'bs_models.pickle'
 BS_MAPEFILE = root / "data" / 'bs_mape.pickle'
@@ -38,26 +25,33 @@ BSVM_MODELFILE = root / "data" / 'bsvm_models.pickle'
 BSVM_MAPEFILE = root / "data" / 'bsvm_mape.pickle'
 BSVM_RFILE = root / "data" / 'bsvm_r.pickle'
 
-MEAN_FILE = root / "data" / 'mean.pickle'
-
-
+# parameters
 EPOCHS = 10
 R_THRESHOLD = 0.05
 MAPE_THRESHOLD = 0.20
 
+# folder for summary saving
 SUM_FOLDER = 'summaries/'
 
+'''
+The critical part of the module that computes the best models with different strategies
+Initialised with data and log indicator
+'''
 class Analyses:
 	def __init__(self, data, log):
 		self.data = data
 		self.log = log
 
+	# plots models and variables in to_plot
 	def make_plots(self, to_plot):
+		# get vars
 		x_vars = to_plot[0]
 		y_vars = to_plot[1]
 		colin_vars = to_plot[2]
 		statplots = to_plot[3]
+		# get combinations for colinearity analysis
 		colin_pairs = combinations(colin_vars, 2)
+
 		for x in x_vars:
 			for y in y_vars:
 				self.scplot(self.data[x], self.data[y])				
