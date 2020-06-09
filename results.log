@@ -1544,3 +1544,63 @@ Best models obtained via backward selection:
 ----------------------------------
 Model 'popularity_abs ~ track_number + duration + key + mode + time_signature + acousticness + danceability + energy + loudness + speechiness + valence + tempo + explicit + complexity' with MAPE of 0.206 and r^2 of 0.304
 Model 'popularity_abs ~ track_number + duration + key + mode + time_signature + acousticness + danceability + energy + instrumentalness + loudness + speechiness + valence + tempo + explicit + complexity' with MAPE of 0.252 and r^2 of 0.286
+--------------------------------------------------------------------------------
+
+----------------------------------
+All single variable models:
+----------------------------------
+Model 'popularity_rel ~ track_number' with MAPE of 1.020 and r^2 of 0.020
+Model 'popularity_rel ~ duration' with MAPE of 0.963 and r^2 of 0.091
+Model 'popularity_rel ~ key' with MAPE of 0.959 and r^2 of 0.015
+Model 'popularity_rel ~ mode' with MAPE of 1.027 and r^2 of 0.002
+Model 'popularity_rel ~ time_signature' with MAPE of 1.072 and r^2 of 0.001
+Model 'popularity_rel ~ acousticness' with MAPE of 1.055 and r^2 of 0.059
+Model 'popularity_rel ~ danceability' with MAPE of 1.101 and r^2 of 0.050
+Model 'popularity_rel ~ energy' with MAPE of 1.192 and r^2 of 0.027
+Model 'popularity_rel ~ instrumentalness' with MAPE of 1.259 and r^2 of 0.037
+Model 'popularity_rel ~ loudness' with MAPE of 1.196 and r^2 of 0.055
+Model 'popularity_rel ~ speechiness' with MAPE of 1.265 and r^2 of 0.016
+Model 'popularity_rel ~ valence' with MAPE of 0.945 and r^2 of 0.038
+Model 'popularity_rel ~ tempo' with MAPE of 1.098 and r^2 of 0.004
+Model 'popularity_rel ~ explicit' with MAPE of 0.968 and r^2 of 0.044
+Model 'popularity_rel ~ complexity' with MAPE of 0.994 and r^2 of 0.151
+Model 'popularity_abs ~ track_number' with MAPE of 0.228 and r^2 of 0.014
+Model 'popularity_abs ~ duration' with MAPE of 0.206 and r^2 of 0.089
+Model 'popularity_abs ~ key' with MAPE of 0.240 and r^2 of 0.016
+Model 'popularity_abs ~ mode' with MAPE of 0.215 and r^2 of 0.001
+Model 'popularity_abs ~ time_signature' with MAPE of 0.263 and r^2 of 0.004
+Model 'popularity_abs ~ acousticness' with MAPE of 0.221 and r^2 of 0.065
+Model 'popularity_abs ~ danceability' with MAPE of 0.213 and r^2 of 0.047
+Model 'popularity_abs ~ energy' with MAPE of 0.204 and r^2 of 0.029
+Model 'popularity_abs ~ instrumentalness' with MAPE of 0.207 and r^2 of 0.037
+Model 'popularity_abs ~ loudness' with MAPE of 0.220 and r^2 of 0.054
+Model 'popularity_abs ~ speechiness' with MAPE of 0.247 and r^2 of 0.017
+Model 'popularity_abs ~ valence' with MAPE of 0.228 and r^2 of 0.042
+Model 'popularity_abs ~ tempo' with MAPE of 0.231 and r^2 of 0.004
+Model 'popularity_abs ~ explicit' with MAPE of 0.227 and r^2 of 0.045
+Model 'popularity_abs ~ complexity' with MAPE of 0.227 and r^2 of 0.148
+
+----------------------------------
+Best single variable models:
+----------------------------------
+Model 'popularity_rel ~ duration' with MAPE of 0.963 and r^2 of 0.091
+Model 'popularity_rel ~ acousticness' with MAPE of 1.055 and r^2 of 0.059
+Model 'popularity_rel ~ danceability' with MAPE of 1.101 and r^2 of 0.050
+Model 'popularity_rel ~ loudness' with MAPE of 1.196 and r^2 of 0.055
+Model 'popularity_rel ~ complexity' with MAPE of 0.994 and r^2 of 0.151
+Model 'popularity_abs ~ duration' with MAPE of 0.206 and r^2 of 0.089
+Model 'popularity_abs ~ acousticness' with MAPE of 0.221 and r^2 of 0.065
+Model 'popularity_abs ~ loudness' with MAPE of 0.220 and r^2 of 0.054
+Model 'popularity_abs ~ complexity' with MAPE of 0.227 and r^2 of 0.148
+
+----------------------------------
+Best models obtained via forward selection:
+----------------------------------
+Model 'popularity_abs ~ energy + complexity' with MAPE of 0.190 and r^2 of 0.150
+Model 'popularity_rel ~ complexity + track_number + explicit + acousticness + mode' with MAPE of 0.876 and r^2 of 0.279
+
+----------------------------------
+Best models obtained via backward selection:
+----------------------------------
+Model 'popularity_abs ~ track_number + duration + key + mode + time_signature + acousticness + danceability + energy + loudness + speechiness + valence + tempo + explicit + complexity' with MAPE of 0.206 and r^2 of 0.304
+Model 'popularity_abs ~ track_number + duration + key + mode + time_signature + acousticness + danceability + energy + instrumentalness + loudness + speechiness + valence + tempo + explicit + complexity' with MAPE of 0.252 and r^2 of 0.286

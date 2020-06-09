@@ -4,7 +4,7 @@ Dep. Variable:         popularity_rel   R-squared:                       0.141
 Model:                            OLS   Adj. R-squared:                  0.131
 Method:                 Least Squares   F-statistic:                     13.77
 Date:                Tue, 09 Jun 2020   Prob (F-statistic):           0.000370
-Time:                        19:38:59   Log-Likelihood:                 3.6378
+Time:                        20:32:45   Log-Likelihood:                 3.6378
 No. Observations:                  86   AIC:                            -3.276
 Df Residuals:                      84   BIC:                             1.633
 Df Model:                           1                                         
