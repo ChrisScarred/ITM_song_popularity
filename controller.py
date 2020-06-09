@@ -18,7 +18,7 @@ FOLDER = 'database'
 NAME = FOLDER + '/itm_songs_database'
 
 class Controller:
-	def __init__(self, getData, doPreprocess, auto, log, custom, full_sum):
+	def __init__(self, getData, doPreprocess, auto, log, custom, full_sum, to_plot):
 		self.getData = getData
 		self.doPreprocess = doPreprocess
 		self.auto = auto
@@ -26,6 +26,8 @@ class Controller:
 		self.log = log
 		self.custom = custom
 		self.full_sum = full_sum
+
+		self.to_plot = to_plot
 		
 		if log:
 			logging.basicConfig(format='%(message)s', filename='results.log',level=logging.INFO)
@@ -90,6 +92,9 @@ class Controller:
 
 		if self.full_sum:
 			a.printSummaries(models)
+
+		if self.to_plot != []:
+			a.make_plots(self.to_plot)
 
 	def performActions(self):
 		data = self.composeData()

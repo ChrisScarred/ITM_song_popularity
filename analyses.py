@@ -13,6 +13,9 @@ import logging
 
 from pathlib import Path
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 root = Path(".")
 
 BF_MODELFILE = root / "data" / 'bf_models.pickle'
@@ -49,6 +52,77 @@ class Analyses:
 		self.data = data
 		self.log = log
 
+	def make_plots(self, to_plot):
+		x_vars = to_plot[0]
+		y_vars = to_plot[1]
+		colin_vars = to_plot[2]
+		statplots = to_plot[3]
+		colin_pairs = combinations(colin_vars, 2)
+		for x in x_vars:
+			for y in y_vars:
+				self.scplot(self.data[x], self.data[y])				
+		for comb in colin_pairs:
+			x = comb[0]
+			y = comb[1]
+			self.scplot(self.data[x], self.data[y])
+		for model in statPlots:
+			self.statPlots(model)
+
+	def scplot(self, x, y):
+		plt.figure()
+		sns.scatterplot(x = x, y = y).set(title = ('Relationship between %s and %s' % (x, y)))
+		name = 'plots/'+x+"_againts_"+y+".png"
+		plt.savefig(name)
+
+	def scPredPlot(self, x, y, prediction):
+		sns.scatterplot(x = x, y = y).set(title = 'Relationship between %s and %s, including linear model' % )
+		sns.lineplot(x = x, y = prediction, color = '#bd1d00')
+		name = 'plots/'+x+"_againts_"+y+"with_prediction.png"
+		plt.savefig(name)
+
+	def statPlots(self, model_str):
+		model = sm.formula.ols(formula=model_str, data=self.data)
+		model_fitted = model.fit()
+
+		intercept = model_fitted.params[0]
+		variables = getVars(model_str)
+
+		target = getTarget(model_str)
+
+		predscores = 0
+		resscores = 0
+
+		for i in range(len(variables)):
+			vname = variables[i]
+			pred_score = intercept + model_fitted.params[i] * self.data[vname]
+			res_score = np.abs(self.data[vname] - pred_score)
+			predscores += pred_score
+			resscores += res_score
+
+		fig, axs = plt.subplots(2, 2, figsize=(15,15))
+
+		sns.scatterplot(x = resscores, y = self.data[target], ax = axs[0,0]).set(
+   			title = ('Absolute residuals against predicted values for model %s' % model_str), 
+    		xlabel = 'Predicted scores', 
+    		ylabel = 'Residuals')
+
+		sns.distplot(resscores, bins = 15, ax = axs[0, 1]).set(
+    		title = ('Histogram of residual scores for model %s' % model_str), 
+    		xlabel = 'Residual scores', 
+    		ylabel = 'Probability')
+
+		scipy.stats.probplot(resscores, plot = axs[1, 0])
+		axs[1, 0].get_lines()[0].set_markerfacecolor('#c5c5d6')
+		axs[1, 0].get_lines()[0].set_markeredgecolor('#c5c5d6')
+
+		sns.scatterplot(x = list(range(0, len(self.data[target]))), y = resscores, ax = axs[1,1]).set(
+   			title = ('Residuals against order of collection for model %s' % model_str), 
+  		  	xlabel = 'Order of collection', 
+  		  	ylabel = 'Residuals')
+
+		namestr = model_str.replace(" ", "_")
+    	name = 'plots/statplot_'+namestr+".png"
+		plt.savefig(name)
 
 	def printSummaries(self, models):
 		for string in models:			
@@ -62,7 +136,6 @@ class Analyses:
 			f.close()
 
 		print("Done saving summaries.")
-
 
 	def printCustom(self, models):
 		mapes, rs = self.getPerformance(models)
@@ -338,6 +411,9 @@ class Analyses:
 				model = model.fit()
 				rs_all.append(model.rsquared)
 				pred_y = np.asarray(model.predict(test))
+
+				if epoch == epochs-1:
+					self.scPredPlot(test, real_y, pred_y)
 				
 				mape = []
 				for i in range(len(pred_y)):
