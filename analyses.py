@@ -102,21 +102,16 @@ class Analyses:
 		target = getTarget(model_str)
 
 		# gets scores
-		predscores = 0
-		resscores = 0
+		predscores = model_fitted.predict(self.data)
+		targets = self.data[target]
 
-		for i in range(len(variables)):
-			vname = variables[i]
-			pred_score = intercept + model_fitted.params[i+1] * self.data[vname]
-			res_score = np.abs(self.data[vname] - pred_score)
-			predscores += pred_score
-			resscores += res_score
+		resscores = targets - predscores
 
 		# creates figures
 		fig, axs = plt.subplots(2, 2, figsize=(15,15))
 
 		# abs residuals
-		sns.scatterplot(x = resscores, y = self.data[target], ax = axs[0,0]).set(
+		sns.scatterplot(x = predscores, y = np.abs(resscores), ax = axs[0,0]).set(
 			title = "\n".join(wrap(('Absolute residuals against predicted values for model %s' % model_str), 60)), 
 			xlabel = 'Predicted scores', 
 			ylabel = 'Residuals')
