@@ -24,6 +24,8 @@ To use the module, one only has to edit `main.py`, specifically these variables:
 	- list `to_plot_y`: a list of variables to plot against `to_plot_x` variables in a scatter plot
 	- list `to_plot_colin`: a list of variables to plot against each other in pairs to see if any of them appear to have a colinear relationship
 	- list `to_plot_stats`: a list of model strings (models) for which statistic graphs should be generated and saved. These include absolute residuals graph, histogram of residuals, the probplot and residuals against order of collection.
+	
+Explanations/documentation of each sub-module is included in its respective `.py` file.
 
 ## Prequisities
 ```
