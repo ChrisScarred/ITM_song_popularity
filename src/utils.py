@@ -1,15 +1,12 @@
 import logging
-
+import pickle
+import scipy
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
-
-from random import randint
-import pickle
-
 import matplotlib.pyplot as plt
 import seaborn as sns
-import scipy
+from random import randint
 from textwrap import wrap
 
 K = 10
