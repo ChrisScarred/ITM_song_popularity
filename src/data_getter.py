@@ -1,145 +1,151 @@
+"""This file contains the class DataGetter used to obtain the songs data from Spotify API."""
+
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-import pandas as pd
 
-# obtained from Spotify Developer API
-SPOTIPY_CLIENT_ID='17fc2297bbdf4be3b339cf17f8307c45'
-SPOTIPY_CLIENT_SECRET='46eaf0adb7c8472994ed2404c7700142'
-SPOTIPY_REDIRECT_URI='http://localhost:8888/callback'
+from src.models import *
 
-'''
-Obtains song info from:
-artist identified by artist_uri
-exluding albums non_inc_albs
-excluding tracks non_inc_tracks
-and saves into file with name *name*.csv
-'''
 class DataGetter:
-	def __init__(self, artist_uri, non_inc_albs, non_inc_tracks, name):
-		# initialisation
-		self.artist_uri = artist_uri
-		self.non_inc_tracks = non_inc_tracks
-		self.non_inc_albs = non_inc_albs
-		self.name = name
-		# connects to spotify
-		self.spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, 
-			client_secret=SPOTIPY_CLIENT_SECRET))		
+	"""A class to obtain song data from Spotify API.
 
-	# gets the song data
-	def getData(self):
-		# gets all albums
-		album_results = self.spotify.artist_albums(self.artist_uri, album_type='album')
+	Methods:
+		get_albums(artist_uri): obtains all albums of an artist identified by artist_uri
+		get_songs(album_id): obtains all songs of an album identified by album_id
+		get_songs_data(artist_uri, non_inc_albums, non_inc_songs): obtains the song data for all songs of an artist identified by artist_uri except for the songs present in one of the non_inc_albums or being in non_inc_songs
+		get_song_data(self, name, song_id): obtains the song data for a song identified by the name name and the id song_id
+	"""
+
+	def __init__(self, client_id: str, client_secret: str):
+		"""Initialises a DataGetter object.
+
+		Args:
+			client_id (str): The client id as supplied by Spotify.
+			client_secret (str): The client secret as supplied by Spotify.
+		"""
+
+		self.spotify = spotipy.Spotify(
+			client_credentials_manager=SpotifyClientCredentials(
+				client_id=client_id, 
+				client_secret=client_secret
+			)
+		)
+
+	def get_albums(self, artist_uri: str) -> List[Dict]:
+		"""Obtains all albums of an artist identified by artist_uri.
+
+		Args:
+			artist_uri (str): the uri identifying the artist.
+
+		Returns:
+			List[Dict]: the list of albums in the form of json dicts.
+		"""
+
+		album_results = self.spotify.artist_albums(
+			artist_uri, 
+			album_type='album'
+		)
 		albums = album_results['items']
-
-		# prepares song df
-		songs_data = pd.DataFrame({
-			"name":[], 
-			"id":[],
-			"track_number":[],
-			"duration_ms":[],
-			"key":[],
-			"mode":[],
-			"time_signature":[],
-			"acousticness":[],
-			"danceability":[],
-			"energy":[],
-			"instrumentalness":[],
-			"loudness":[],
-			"speechiness":[],
-			"valence":[],
-			"tempo":[],
-			"explicit":[],
-			"complexity":[],
-			"popularity":[]
-			})
 	
-		# loops through album iterator, gets albums items (songs) of every album object
 		while album_results['next']:
 			album_results = self.spotify.next(album_results)
 			albums.extend(album_results['items'])
+		
+		return albums
 
-		# loops thorugh the list of album items (songs)
+	def get_songs(self, album_id: str) -> List[Dict]:
+		"""Obtains all songs of an album identified by album_id.
+
+		Args:
+			album_id (str): the album id.
+
+		Returns:
+			List[Dict]: the list of songs in the form of json dicts.
+		"""
+
+		song_results = self.spotify.album_tracks(album_id)
+		songs = song_results['items']
+
+		while song_results['next']:
+			song_results = self.spotify.next(song_results)
+			songs.extend(song_results['items'])
+
+		return songs
+
+	def get_songs_data(self, artist_uri: str, non_inc_albums: List[str] = [], non_inc_songs: List[str] = []) -> List[Song]:
+		"""Obtains the song data for all songs of an artist.
+
+		Identifies the authoring artist by the artist_uri as obtained from Spotify. Does not include songs present in albums whose name matches one of the non_inc_albums entries. Does not include songs whose name matches one of the non_inc_songs entries.
+
+		Args:
+			artist_uri (str): the artist uri as obtained from Spotify.
+			non_inc_albums (List[str], optional): The list of names of albums to exclude. Defaults to [].
+			non_inc_songs (List[str], optional): The list of names of songs to exclude. Defaults to [].
+
+		Returns:
+			List[Song]: the songs data as a list of Song objects.
+		"""
+
+		songs_data = []
+		albums = self.get_albums(artist_uri)
+		
 		for album in albums:
-			# checks if album should be included
 			album_name = album['name']
-			if all([album_name != x for x in self.non_inc_albs]): 
-				album_id = album['id']
+			album_id = album['id']
 
-				print("Processing album "+album_name)			
+			if not album_name in non_inc_albums:
+				print("Processing album `%s` with id `%s`" % (album_name, album_id))			
 
-				# obtains the song info
-				track_results = self.spotify.album_tracks(album_id)
-				# obtains the items of songs info
-				tracks = track_results['items']
+				songs = self.get_songs(album_id)
 
-				# saves the items to array
-				while track_results['next']:
-					track_results = self.spotify.next(track_results)
-					tracks.extend(track_results['items'])
+				for song in songs:
+					song_id = song['id']
+					song_name = song['name']
 
-				# processes all songs
-				for track in tracks:
-					track_id = track['id']
-					track_name = track['name']
-					# checks if should be included
-					if all(track_name != x for x in self.non_inc_tracks):
-						print('- - Processing track '+track_name)
-						# appends new song data to songs_data df
-						songs_data = self.getSongData(songs_data, track_name, track_id)
-		# saves the data to csv
-		songs_data.to_csv(self.name+".csv")			
-		print("Done. Results saved to file "+self.name+".csv")
+					if not song_name in non_inc_songs:
+						print('- Processing song `%s` with id `%s`' % (song_name, song_id))
+
+						songs_data.append(self.get_song_data(song_name, song_id))
+					
+					else:
+						print('- Skipping song `%s` with id `%s`' % (song_name, song_id))
+			
+			else:
+				print("Skipping album `%s` with id `%s`" % (album_name, album_id))
 
 		return songs_data
 
-	def getSongData(self, df, name, track_id):
-		# obtains wanted results
-		features = self.spotify.audio_features(tracks=[track_id])[0]
-		track_data = self.spotify.track(track_id)
-		analysis = self.spotify.audio_analysis(track_id)
+	def get_song_data(self, name: str, song_id: str) -> Song:
+		"""Obtains the song data for a song identified by the name string name and the id song_id.
 
-		# prepares variables
-		duration_ms = features["duration_ms"]
-		key = features["key"]
-		mode = features["mode"]
-		time_signature = features["time_signature"]
-		acousticness = features["acousticness"]
-		danceability = features["danceability"]
-		energy = features["energy"]
-		instrumentalness = features["instrumentalness"]
-		loudness = features["loudness"]
-		speechiness = features["speechiness"]
-		valence = features["valence"]
-		tempo = features["tempo"]
-		explicit = 1 if track_data["explicit"] else 0
-		track_number = track_data["track_number"]
-		complexity = len(analysis["segments"])
+		Args:
+			name (str): the song name.
+			song_id (str): the song id.
 
-		popularity = track_data["popularity"]
+		Returns:
+			Song: the song data as an object of type Song.
+		"""
 
-		# creates df
-		song_data = pd.DataFrame({
-			"name":[name], 
-			"id":[track_id],
-			"track_number":[track_number],
-			"duration_ms":[duration_ms],
-			"key":[key],
-			"mode":[mode],
-			"time_signature":[time_signature],
-			"acousticness":[acousticness],
-			"danceability":[danceability],
-			"energy":[energy],
-			"instrumentalness":[instrumentalness],
-			"loudness":[loudness],
-			"speechiness":[speechiness],
-			"valence":[valence],
-			"tempo":[tempo],
-			"explicit":[explicit],
-			"complexity":[complexity],
-			"popularity":[popularity]
-			})
+		features = self.spotify.audio_features(tracks=[song_id])[0]
+		song_data = self.spotify.track(song_id)
+		analysis = self.spotify.audio_analysis(song_id)
 
-		# appends new df to all data df 
-		df = df.append(song_data, ignore_index = True)
-
-		return df
+		return Song(
+			name = name,
+			id = song_id,
+			duration_ms = features["duration_ms"],
+			key = features["key"],
+			mode = features["mode"],
+			time_signature = features["time_signature"],
+			acousticness = features["acousticness"],
+			danceability = features["danceability"],
+			energy = features["energy"],
+			instrumentalness = features["instrumentalness"],
+			loudness = features["loudness"],
+			speechiness = features["speechiness"],
+			valence = features["valence"],
+			tempo = features["tempo"],
+			explicit = 1 if song_data.get("explicit") else 0,
+			track_number = song_data["track_number"],
+			complexity = len(analysis["segments"]),
+			popularity = song_data["popularity"]
+		)

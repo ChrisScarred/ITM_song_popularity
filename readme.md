@@ -7,30 +7,28 @@ This version is currently in development.
 ## Prequisities
 
 - make and activate a python virtual environment
-- do `python -m pip install -r requirements.txt`
+- install the dependencies via `python -m pip install -r requirements.txt`
 
 ## Usage
 
-The module contains several sub-modules:
+### Obtaining song data
 
-- `dataGetter.py` for obtaining the data
-- `preprocess.py` to preprocess the data
-- `analyses.py` to compose models and analyse their performance
-- `utils.py` with certain generally useful functions
-- `controller.py` to control the behaviour of submodules and link them together
+- make a copy of `.env.example`, rename it to `.env` and add your client id and client secret
+- run the function `get_and_save_songs()` from `src.processes`
+- to obtain the data set this report uses, following script was used:
 
-To use the module, one only has to edit `main.py`, specifically these variables:
+```python
+from src.processes import get_and_save_songs
 
-- boolean `getData`: False if data should not be obtained but instead used the last saved version
-- boolean `doPreprocess`: False if data should not be preprocessed and instead the last saved version of preprocessed data should be used
-- boolean `auto`: if true, automatically obtains missing data; adviced to keep True
-- boolean `log`: it True, information on model analyses should be saved into file `results.log`. If False, all information is printed via the console.
-- list `custom`: contains model strings (models) that should be analysed regardless whether they are considered good by the algorithm; can be empty
-- boolean `fullSum`: if True, saves summaries of all models considered good and all models in the list `custom` to the folder `summaries` by the name of the model
-- variables for plot generation:
-  - list `to_plot_x`: a list of variables to plot against `to_plot_y` variables in a scatter plot
-  - list `to_plot_y`: a list of variables to plot against `to_plot_x` variables in a scatter plot
-  - list `to_plot_colin`: a list of variables to plot against each other in pairs to see if any of them appear to have a colinear relationship
-  - list `to_plot_stats`: a list of model strings (models) for which statistic graphs should be generated and saved. These include absolute residuals graph, histogram of residuals, the probplot and residuals against order of collection.
+def main():
+    artist_uri = "spotify:artist:6tbLPxj1uQ6vsRQZI2YFCT"
+    non_inc_albs = ["Blood at the Orpheum (Live)", "Blood"]
+    non_inc_tracks = ["Interview (Bonus)"]
+    json_name = "data/itm_songs.json"
+    csv_name = "data/itm_songs.csv"
 
-Explanations/documentation of each sub-module is included in its respective `.py` file.
+    get_and_save_songs(artist_uri, json_name, csv_name, non_inc_albs, non_inc_tracks)
+
+if __name__ == "__main__":
+    main()
+```
