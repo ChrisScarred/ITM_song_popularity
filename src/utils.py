@@ -16,11 +16,10 @@ def save_songs_as_json(songs: List[Song], file_name: str) -> bool:
 	Returns:
 		bool: successfulness of the saving action.
 	"""
-
 	songs = [song.dict() for song in songs]
 	try:
-		with open(file_name, "w") as f:
-			json.dump(songs, fp=f)
+		with open(file_name, "w+") as f:
+			json.dump(songs, f)
 	except:
 		return False
 	return True
