@@ -46,3 +46,13 @@ def get_and_save_songs(artist_uri: str, json_name: str, csv_name: str, non_inc_a
 
     else:
         print("Saving was not successful.")
+
+
+def get_and_save_ITM_songs():
+    """Sets up all parameters as needed to obtain all studio songs by In This Moment. 
+    """
+    get_and_save_songs("spotify:artist:6tbLPxj1uQ6vsRQZI2YFCT", "database/itm_songs.json", "database/itm_songs.csv", non_inc_albs=["Blood at the Orpheum (Live)", "Blood"], non_inc_songs=["Interview (Bonus)"])
+
+
+if __name__=="__main__":
+    get_and_save_ITM_songs()
