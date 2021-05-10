@@ -15,20 +15,4 @@ This version is currently in development.
 
 - make a copy of `.env.example`, rename it to `.env` and add your client id and client secret
 - run the function `get_and_save_songs()` from `src.processes`
-- to obtain the data set this report uses, following script was used:
-
-```python
-from src.processes import get_and_save_songs
-
-def main():
-    artist_uri = "spotify:artist:6tbLPxj1uQ6vsRQZI2YFCT"
-    non_inc_albs = ["Blood at the Orpheum (Live)", "Blood"]
-    non_inc_tracks = ["Interview (Bonus)"]
-    json_name = "data/itm_songs.json"
-    csv_name = "data/itm_songs.csv"
-
-    get_and_save_songs(artist_uri, json_name, csv_name, non_inc_albs, non_inc_tracks)
-
-if __name__ == "__main__":
-    main()
-```
+- to obtain the data set this report uses, run `get_and_save_ITM_songs` from `src.processes` from terminal with command `python -m src.processes`
