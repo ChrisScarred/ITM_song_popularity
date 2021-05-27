@@ -3,10 +3,10 @@
 from pydantic import BaseModel
 from typing import List, Dict
 
+
 class Song(BaseModel):
     """Represents the raw data as received from the Spotify API.
     """
-    
     name: str
     id: str
     track_number: int
@@ -26,3 +26,4 @@ class Song(BaseModel):
     complexity: int
     popularity: int
     release_date: str
+

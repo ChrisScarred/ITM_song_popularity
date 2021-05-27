@@ -7,7 +7,7 @@ from src.models import *
 
 
 def save_songs_as_json(songs: List[Song], file_name: str) -> bool:
-	"""Saves the list of songs in the Song object format as .json format.
+	"""Saves the list of songs in the Song or ProcessedSong object format as .json format.
 
 	Args:
 		songs (List[Song]): the list of songs data to save.
@@ -24,6 +24,7 @@ def save_songs_as_json(songs: List[Song], file_name: str) -> bool:
 		return False
 	return True
 
+
 def json_to_csv(input_file: str, output_file: str) -> bool:
 	"""Transforms .json data into .csv data.
 
@@ -34,7 +35,6 @@ def json_to_csv(input_file: str, output_file: str) -> bool:
 	Returns:
 		bool: The successfulness of the conversion.
 	"""
-
 	try:
 		df = pd.read_json(path_or_buf=input_file)
 		df.to_csv(output_file)
