@@ -25,3 +25,4 @@ class Song(BaseModel):
     explicit: int
     complexity: int
     popularity: int
+    release_date: str

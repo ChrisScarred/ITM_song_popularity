@@ -2,6 +2,16 @@
 
 This changelog documents the changes applied to the previous version of this project, located in the branch `2020`.
 
+## 27. 05. 2021
+
+### Added
+
+- `poetry` package to manage dependencies
+
+### Changed
+
+- the data set now contains the variable `release_date`
+
 ## 10. 04. 2021
 
 ### Added

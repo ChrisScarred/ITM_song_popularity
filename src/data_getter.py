@@ -1,5 +1,6 @@
 """This file contains the class DataGetter used to obtain the songs data from Spotify API."""
 
+from os import sys
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -45,11 +46,11 @@ class DataGetter:
 			album_type='album'
 		)
 		albums = album_results['items']
-	
-		while album_results['next']:
-			album_results = self.spotify.next(album_results)
-			albums.extend(album_results['items'])
 		
+		while album_results['next']:
+			album_results = self.spotify.next(album_results)			
+			albums.extend(album_results['items'])
+
 		return albums
 
 	def get_songs(self, album_id: str) -> List[Dict]:
@@ -91,6 +92,7 @@ class DataGetter:
 		for album in albums:
 			album_name = album['name']
 			album_id = album['id']
+			album_release = album['release_date']
 
 			if not album_name in non_inc_albums:
 				print("Processing album `%s` with id `%s`" % (album_name, album_id))			
@@ -104,7 +106,13 @@ class DataGetter:
 					if not song_name in non_inc_songs:
 						print('- Processing song `%s` with id `%s`' % (song_name, song_id))
 
-						songs_data.append(self.get_song_data(song_name, song_id))
+						songs_data.append(
+							self.get_song_data(
+								song_name, 
+								song_id,
+								album_release
+							)
+						)
 					
 					else:
 						print('- Skipping song `%s` with id `%s`' % (song_name, song_id))
@@ -114,12 +122,13 @@ class DataGetter:
 
 		return songs_data
 
-	def get_song_data(self, name: str, song_id: str) -> Song:
+	def get_song_data(self, name: str, song_id: str, release_date: str) -> Song:
 		"""Obtains the song data for a song identified by the name string name and the id song_id.
 
 		Args:
 			name (str): the song name.
 			song_id (str): the song id.
+			release_date (str): the release date of the album the song comes from.
 
 		Returns:
 			Song: the song data as an object of type Song.
@@ -147,5 +156,6 @@ class DataGetter:
 			explicit = 1 if song_data.get("explicit") else 0,
 			track_number = song_data["track_number"],
 			complexity = len(analysis["segments"]),
-			popularity = song_data["popularity"]
+			popularity = song_data["popularity"],
+			release_date = release_date
 		)

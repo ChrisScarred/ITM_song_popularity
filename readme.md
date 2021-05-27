@@ -6,8 +6,9 @@ This version is currently in development.
 
 ## Prequisities
 
-- make and activate a python virtual environment
-- install the dependencies via `python -m pip install -r requirements.txt`
+- python 3.7.1 or higher but at most 3.9
+- poetry package for python (install via `python -m pip install poetry` if you do not have it yet)
+- install the python package dependencies via `poetry install`, this also automatically creates a virtual environment for the project
 
 ## Usage
 
@@ -15,4 +16,16 @@ This version is currently in development.
 
 - make a copy of `.env.example`, rename it to `.env` and add your client id and client secret
 - run the function `get_and_save_songs()` from `src.processes`
-- to obtain the data set this report uses, run `get_and_save_ITM_songs` from `src.processes` from terminal with command `python -m src.processes`
+- to obtain the data set this report uses, run `get_and_save_ITM_songs` from `src.processes` from terminal with command `poetry run python -m src.processes`
+
+### Profiling the raw data
+
+- run the function `src.profiling:profiling` which takes three attributes:
+  - csv_source (str): the csv input file path to profile
+  - report_title (str): the requested title of the report
+  - profile_out (str): the html output file path
+- to obtain the profile of the data set this report uses, simply run `poetry run python -m src.profiling`
+
+## Personal notes
+
+- obtained the data with release years to check for time effects on popularity (there is no time-series effect because the retrieval of values happens at the same time)
