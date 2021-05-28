@@ -38,7 +38,7 @@ def preprocess(raw_path: str, preprocessed_path: str) -> None:
         "duration": normalise(raw_data["duration_ms"]),
         "key": [KEYS.get(num, "") for num in raw_data["key"]],
         "mode": [MODES.get(num, "") for num in raw_data["mode"]],
-        "time_signature": normalise(raw_data["time_signature"]),
+        "time_signature": raw_data["time_signature"],
         "acousticness": raw_data["acousticness"],
         "danceability": raw_data["danceability"],
         "energy": raw_data["energy"],
