@@ -1,4 +1,5 @@
-"""This file contains the default processes supported by this module."""
+"""This file contains the default processes supported by this module.
+"""
 
 import os
 from dotenv import dotenv_values

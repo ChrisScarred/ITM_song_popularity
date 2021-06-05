@@ -1,4 +1,5 @@
-"""This file contains various utility functions."""
+"""This file contains various utility functions.
+"""
 
 import pandas as pd
 import json

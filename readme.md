@@ -25,7 +25,3 @@ This version is currently in development.
   - report_title (str): the requested title of the report
   - profile_out (str): the html output file path
 - to obtain the profile of the data set this report uses, simply run `poetry run python -m src.profiling`
-
-## Personal notes
-
-- obtained the data with release years to check for time effects on popularity (there is no time-series effect because the retrieval of values happens at the same time)

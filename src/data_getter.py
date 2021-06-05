@@ -1,4 +1,5 @@
-"""This file contains the class DataGetter used to obtain the songs data from Spotify API."""
+"""This file contains the class DataGetter used to obtain the songs data from Spotify API.
+"""
 
 from os import sys
 import spotipy

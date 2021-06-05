@@ -7,29 +7,13 @@ import re
 from datetime import datetime
 
 
-KEYS = {
-    0: "c_or_b_sharp",
-    1: "c_sharp_or_d_flat",
-    2: "d",
-    3: "d_sharp",
-    4: "e",
-    5: "f",
-    6: "f_sharp",
-    7: "g",
-    8: "g_sharp",
-    9: "a",
-    10: "b_flat",
-    11: "b"
-}
-
-
-MODES = {
-    0: "minor",
-    1: "major"
-}
-
-
 def preprocess(raw_path: str, preprocessed_path: str) -> None:
+    """Preprocesses the song information from the raw csv file.
+
+    Args:
+        raw_path (str): the path to the raw csv file.
+        preprocessed_path (str): the path to the csv file where the preprocessed data are stored.
+    """
     raw_data = pd.read_csv(raw_path)
     processed = pd.DataFrame({
         "name": raw_data["name"],
@@ -57,12 +41,16 @@ def preprocess(raw_path: str, preprocessed_path: str) -> None:
 
 
 def get_age_days(data: List) -> List:
+    """Converts a list of dates in strings into the list of age in days.
+    """
     date_format = "%Y-%m-%d"
     today = datetime.now()
     return [(today-datetime.strptime(date, date_format)).days for date in data]
 
 
 def normalise(data: List) -> List:
+    """Performs min-max normalisation (also called standardisation).
+    """
     min_val = min(data)
     diff = max(data) - min_val
     return [((x-min_val)/diff) for x in data]
