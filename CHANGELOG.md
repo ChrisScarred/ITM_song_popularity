@@ -2,6 +2,16 @@
 
 This changelog documents the changes applied to the previous version of this project, located in the branch `2020`.
 
+## 06. 06. 2021
+
+### Added
+
+- `appendices` folder for the appendices notebooks
+
+### Changed
+
+- finished the project
+
 ## 27. 05. 2021
 
 ### Added
