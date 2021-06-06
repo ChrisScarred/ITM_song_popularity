@@ -2,8 +2,6 @@
 
 This project aims to identify the most important musical aspects of a song by ITM with regards to the song popularity.
 
-This version is currently in development.
-
 ## Prequisities
 
 - python 3.7.1 or higher but at most 3.9
